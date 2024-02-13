@@ -68,6 +68,61 @@ func TestTeamsService_GetTeams(t *testing.T) {
 	}
 }
 
+func TestTeamsService_GetTeam(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/team/123", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		fmt.Fprint(w,
+			`{
+			  "team": {
+				"id": "1234",
+				"name": "My ClickUp Team",
+				"color": "#000000",
+				"avatar": "https://clickup.com/avatar.jpg",
+				"members": [
+				{
+					"user": {
+					"id": 123,
+					"username": "John Doe",
+					"color": "#000000",
+					"profilePicture": "https://clickup.com/avatar.jpg"
+					}
+				}
+				]
+			}}`,
+		)
+	})
+
+	ctx := context.Background()
+	artifacts, _, err := client.Teams.GetTeam(ctx, "123")
+	if err != nil {
+		t.Errorf("Actions.ListArtifacts returned error: %v", err)
+	}
+
+	user := TeamUser{
+		ID:             123,
+		Username:       "John Doe",
+		Color:          "#000000",
+		ProfilePicture: "https://clickup.com/avatar.jpg",
+	}
+	m := TeamMember{
+		User: user,
+	}
+	want := Team{
+		ID:      "1234",
+		Name:    "My ClickUp Team",
+		Color:   "#000000",
+		Avatar:  "https://clickup.com/avatar.jpg",
+		Members: []TeamMember{m},
+	}
+	// want = append(want, team)
+	if !cmp.Equal(artifacts, want) {
+		t.Errorf("Actions.ListArtifacts returned %+v, want %+v", artifacts, want)
+	}
+}
+
 func TestTeamsService_GetSeats(t *testing.T) {
 	client, mux, _, teardown := setup()
 	defer teardown()

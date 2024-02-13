@@ -78,7 +78,7 @@ type Plan struct {
 }
 
 // Teams is the legacy term for what are now called Workspaces in ClickUp.
-// For compatablitly, the term team is still used in this API.
+// For compatibility, the term team is still used in this API.
 // This is NOT the new "Teams" feature which represents a group of users.
 func (s *TeamsService) GetTeams(ctx context.Context) ([]Team, *Response, error) {
 	req, err := s.client.NewRequest("GET", "team", nil)
@@ -96,7 +96,7 @@ func (s *TeamsService) GetTeams(ctx context.Context) ([]Team, *Response, error) 
 }
 
 // Teams is the legacy term for what are now called Workspaces in ClickUp.
-// For compatablitly, the term team is still used in this API.
+// For compatibility, the term team is still used in this API.
 // This is NOT the new "Teams" feature which represents a group of users.
 func (s *TeamsService) GetSeats(ctx context.Context, teamId string) (Seats, *Response, error) {
 	u := fmt.Sprintf("team/%s/seats", teamId)
@@ -115,7 +115,7 @@ func (s *TeamsService) GetSeats(ctx context.Context, teamId string) (Seats, *Res
 }
 
 // Teams is the legacy term for what are now called Workspaces in ClickUp.
-// For compatablitly, the term team is still used in this API.
+// For compatibility, the term team is still used in this API.
 // This is NOT the new "Teams" feature which represents a group of users.
 func (s *TeamsService) GetPlan(ctx context.Context, teamId string) (Plan, *Response, error) {
 	u := fmt.Sprintf("team/%s/plan", teamId)
@@ -131,4 +131,22 @@ func (s *TeamsService) GetPlan(ctx context.Context, teamId string) (Plan, *Respo
 	}
 
 	return pr.Plan, resp, nil
+}
+
+func (s *TeamsService) GetTeam(ctx context.Context, workspaceIDOrTeamID string) (Team, *Response, error) {
+	res := struct {
+		Team `json:"team"`
+	}{}
+	u := fmt.Sprintf("team/%s", workspaceIDOrTeamID)
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return res.Team, nil, err
+	}
+
+	resp, err := s.client.Do(ctx, req, &res)
+	if err != nil {
+		return res.Team, resp, err
+	}
+
+	return res.Team, resp, nil
 }
