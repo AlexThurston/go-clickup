@@ -72,9 +72,10 @@ type Features struct {
 }
 
 type Space struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Private  bool   `json:"private"`
+	ID       string            `json:"id"`
+	Name     string            `json:"name"`
+	Private  bool              `json:"private"`
+	Members  []map[string]User `json:"members"`
 	Statuses []struct {
 		ID         string      `json:"id"`
 		Status     string      `json:"status"`
